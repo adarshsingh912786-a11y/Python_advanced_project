@@ -12,6 +12,10 @@ from service import (
     change_stock
 )
 
+from analytics import (
+    calculate_total_inventory_value
+)
+
 while True:
 
     create_table()
@@ -21,7 +25,8 @@ while True:
 1️⃣. Add Products
 2️⃣. View Products
 3️⃣. Change Stock
-4️⃣. Exit
+4️⃣. Inventory Total
+5️⃣. Exit
 """)
     
     choice  = input("Choose the operation from menu : ")
@@ -58,9 +63,19 @@ while True:
 
         update_quantity = change_stock(id, change_amount)
 
-        print(f"\nupdated_quantity: {update_quantity[2]}\n")
+        print(f"\nupdated_quantity: {update_quantity["updated_quantity"]}")
+        if  update_quantity["low_stock"]:
+            print("Warning! Stock thresolhd trigger")
 
     elif choice == "4":
+
+        total = calculate_total_inventory_value()
+
+        print(f"\nTotal inventory value : {total["total_value"]}")
+        print(f"Total inventory products : {total["total_products"]}")
+        print(f"Average inventory value : {total["average_value"]}\n")
+
+    elif choice == "5":
         print("Thank you...")
         break
     else:
