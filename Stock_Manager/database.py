@@ -21,6 +21,16 @@ def create_table():
                    )
 """)
     
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS alerts (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   product_id INTEGER NOT NULL,
+                   message TEXT NOT NULL,
+                   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                   FOREIGN KEY(product_id) REFERENCES inventory(id)
+                   )
+""")
+    
     conn.commit()
     conn.close()
 
@@ -36,6 +46,18 @@ def add_product(name, quantity, price, low_stock_threshold):
     
     conn.commit()
     conn.close()
+
+def add_alerts(product_id, message):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO alerts (product_id, message) VALUES (?, ?)
+""", (product_id, message))  
+
+    conn.commit()
+    conn.close()  
 
 def get_product_by_id(product_id):
 
