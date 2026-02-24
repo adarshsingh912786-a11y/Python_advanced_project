@@ -48,5 +48,39 @@ def add_client(name, phone, email):
     conn.commit()
     conn.close()
     
+def get_client_by_id(client_id):
 
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.execute(""" SELECT * FROM clients WHERE client_id = ?
+""" ,(client_id,))
+    
+    row = cursor.fetchone()
+    conn.close
+
+    return row
+
+def interaction(client_id,type,note):
+
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+            INSERT INTO interaction (client_id,note,interaction_type)
+                   VALUES(?,?,?)
+""",(client_id,note,type))
+    
+    conn.commit()
+    conn.close()
+
+def update_client(client_id,new_status):
+
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE clients SET status = ? WHERE id = ?",(new_status,client_id)) 
+
+    conn.commit()   
+    conn.close()
     
