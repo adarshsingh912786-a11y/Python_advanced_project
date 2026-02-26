@@ -83,4 +83,19 @@ def update_client(client_id,new_status):
 
     conn.commit()   
     conn.close()
+
+def view_record_by_status(status):
+
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.excute("""
+                SELECT * FROM client WHERE status = ?
+ """,(status,)) 
+
+    row = cursor.fetchall()
+    conn.close()
+    return row
+
+           
     
