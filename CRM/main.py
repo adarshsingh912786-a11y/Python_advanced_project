@@ -1,101 +1,94 @@
 from database import (
-    creat_table
+    create_table
 )
 
 from service import (
-    
-    update_client_status,
     create_client,
     add_interaction,
+    update_client_status,
     view_records
 )
 
 def main():
 
-    
-     creat_table()
+    create_table()
 
-     while True:
+    while True:
 
-        print("....... CRM SYSTEM.......")
+        print("---------------- CRM System ----------------")
         print("""
-    1. Add client Information
-    2. Add Interaction
-    3. Update Status
-    4. View Record
-    5. Exit
-            
+    1️⃣. Add client
+    2️⃣. Add interaction
+    3️⃣. Update Status
+    4️⃣. View Records By Status
+    5️⃣. Exit
     """)
         
-        choice = input("choose from given option: ")
+        choice  = input("Choose from menu : ")
 
         if choice == "1":
-            name = input("Enter the name of client: ")
-            phone = input("client phone no: ")
-            email = input("client email: ")
 
-            try :
-                create_client(name,phone,email)
-                print("Client add succesfully")
+            name  = input("Enter the name of client: ")
+            phone = input("Clients phone_no : ")
+            email = input("Clients email : ")
 
+            try:
+                create_client(name, phone, email)
+                print("Client added successfully✔️")
             except ValueError as e:
-                print(f"Error: {e}")
+                print(f"Error : {e}")
             except Exception as e:
                 print(f"Error : {e}")
+
 
         elif choice == "2":
-
-            client_id = int(input("Enter the client id: "))
-            type = input("Enter the way of Interaction: ")
-            note = input("Leave some note: ")
+            
+            client_id = int(input("Enter the client_id : "))
+            interaction_type = input("Enter the way of interaction: ")
+            note = input("Leave some note : ")
 
             try:
-                add_interaction(client_id,type,note)
+                add_interaction(client_id, interaction_type, note)
+                print("Interaction Record saved successfully✔️")
             except ValueError as e:
                 print(f"Error : {e}")
             except Exception as e:
-                print("Error : {e}")        
+                print(f"Error : {e}")
+
 
         elif choice == "3":
-            client_id = int(input("Enter the client id: "))
-            new_status = input("Enter the Updated Staus: ")
+            
+            client_id = int(input("Enter the client_id : "))
+            new_status = input("Enter the updated status (contacted/ converted/ lost): ")
 
             try:
-                update_client_status(client_id,new_status)
+                update_status = update_client_status(client_id, new_status)
+                print(f"Client_id : {update_status['client_id']}")
+                print(f"New status : {update_status['Update_status']}")
             except ValueError as e:
                 print(f"Error : {e}")
             except Exception as e:
-                print(f"Error : {e}")    
+                print(f"Error : {e}")
+
 
         elif choice == "4":
+            
+            status = input("Enter the Status: ")
 
-            status = input("Enter the staust: ")
-
-            try :
+            try:
                 records = view_records(status)
                 for view in records:
-                    print(f"{view[1]} | {view[2]} | {view[3]} | {view[4]} | {view[5]}")
+                    print(f"{view[0]}. {view[1]} | {view[2]} | {view[3]} | {view[4]} | {view[5]}")
             except ValueError as e:
                 print(f"Error : {e}")
 
-            except Exception as e :
-                print(f"Error {e}")            
-            
+
         elif choice == "5":
-            print("Goodbye")
+            print("Good-Bye.....")
             break
+
         else:
-            print("Chooce from givem option")
+            print("Choose from menu only")
 
 if __name__ == "__main__":
-    main()            
-
-
-
-        
-        
-        
-         
-            
-
-
+    main()
