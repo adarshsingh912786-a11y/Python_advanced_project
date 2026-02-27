@@ -1,35 +1,36 @@
 import sqlite3
 
-file_name = "client databse.db"
+file_name = "client_database.db"
 
 def get_connect():
-    return sqlite3.connect(file_name)
+    conn =  sqlite3.connect(file_name)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
-def creat_table():
+def create_table():
 
     conn = get_connect()
     cursor = conn.cursor()
 
-    cursor.execute(""" 
-            CREATE TABLE IF NOT EXISTS clients(
-                   id INTEGER PRIMARY KEY AUTOMATION,
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS clients (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    name TEXT NOT NULL,
                    phone_no TEXT NOT NULL,
                    email TEXT NOT NULL UNIQUE,
-                   status TEXT NOT NULL CHECK(status IN("lead","contacted","converted","lost")),
+                   status TEXT NOT NULL CHECK(status IN("lead", "contacted", "converted", "lost")),
                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
                    )
 """)
     
-    cursor.execute(""" 
-            CREATE TABLE IF NOT EXISTS interactions(
-                   id INTEGER PRIMARY KEY AUTOMATION,
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS interactions (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    client_id INTEGER NOT NULL,
                    note TEXT NOT NULL,
-                   note TEXT NOT NULL,
-                   interaction_type TEXT NOT NULL CHECK(interaction_type IN("call","email","meeting")),
-                   create_at TEXT DEFAULT CURRENT_TEMESTAMP
-                   FOREIGN KEY (client_id) REFERENCES clients(id)
+                   interaction_type TEXT NOT NULL CHECK(interaction_type IN("call", "email", "meeting")),
+                   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                   FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
                    )
 """)
     
@@ -42,60 +43,58 @@ def add_client(name, phone, email):
     cursor = conn.cursor()
 
     cursor.execute("""
-            INSERT INTO clients (name, phone_no, email, status) VALUES (?,?,?,?)
+        INSERT INTO clients (name, phone_no, email, status) VALUES (?, ?, ?, ?)    
 """, (name, phone, email, "lead"))
     
     conn.commit()
     conn.close()
-    
+
 def get_client_by_id(client_id):
 
     conn = get_connect()
     cursor = conn.cursor()
 
-    cursor.execute(""" SELECT * FROM clients WHERE client_id = ?
-""" ,(client_id,))
-    
+    cursor.execute("SELECT * FROM clients WHERE id = ?",(client_id, ))
+
     row = cursor.fetchone()
-    conn.close
+    conn.close()
 
     return row
 
-def interaction(client_id,type,note):
+def interaction(client_id, interaction_type, note):
 
     conn = get_connect()
     cursor = conn.cursor()
 
     cursor.execute("""
-            INSERT INTO interaction (client_id,note,interaction_type)
-                   VALUES(?,?,?)
-""",(client_id,note,type))
+        INSERT INTO interactions (client_id, note, interaction_type)
+                   VALUES (?, ?, ?)
+""",(client_id, note, interaction_type))
     
     conn.commit()
     conn.close()
 
-def update_client(client_id,new_status):
+def update_client(client_id, new_status):
 
     conn = get_connect()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE clients SET status = ? WHERE id = ?",(new_status,client_id)) 
+    cursor.execute("UPDATE clients SET status = ? WHERE id = ?", (new_status, client_id))
 
-    conn.commit()   
+    conn.commit()
     conn.close()
 
-def view_record_by_status(status):
+def view_records_by_status(status):
 
     conn = get_connect()
     cursor = conn.cursor()
 
-    cursor.excute("""
-                SELECT * FROM client WHERE status = ?
- """,(status,)) 
-
-    row = cursor.fetchall()
-    conn.close()
-    return row
-
-           
+    cursor.execute("""
+        SELECT * FROM clients WHERE status = ? 
+""",(status, ))
     
+    row = cursor.fetchall()
+
+    conn.close()
+
+    return row
