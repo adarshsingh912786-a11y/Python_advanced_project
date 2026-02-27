@@ -1,110 +1,100 @@
 import sqlite3
 
 from database import (
+    create_table,
     add_client,
     get_client_by_id,
     interaction,
     update_client,
-    view_record_by_status
-
+    view_records_by_status
 )
 
+
 def create_client(name, phone, email):
-    
+
     if name.strip() == "":
         raise ValueError("Name should not be empty")
     
     if phone == "":
-        raise ValueError("Phone should not empty")
+        raise ValueError("Phone number should not be empty")
     
     if email == "":
         raise ValueError("Email should not be empty")
     
     try:
         add_client(name, phone, email)
-
     except sqlite3.IntegrityError:
         raise ValueError("Client already exists")
 
-def add_interaction(client_id,type,note): 
+def add_interaction(client_id, interaction_type, note):
 
-    client_detail = get_client_by_id(client_id)
+    client_details = get_client_by_id(client_id)
 
-    if client_detail is None:
-        raise ValueError("Client not found")  
+    if client_details is None:
+        raise ValueError("Client not Exists")
+    
+    status = client_details[4]
 
-    status =  client_detail[4]
+    valid_interaction = {"call", "email", "meeting"}
 
-
-    if status != "lead":
-        raise ValueError("Status is not aaplicable")
-
-
-    valid_interaction = {"call","email","meeting"}
-
-    if type not in valid_interaction:
+    if interaction_type not in valid_interaction:
         raise ValueError("Invalid Interaction type")
     
-    try :
-        interaction(client_id,type,note)
+    try:
+        interaction(client_id, type, note)
 
+        if status == "lead":
+            update_client_status(client_id, interaction_type)
+        
     except sqlite3.IntegrityError:
-        raise ValueError("Check Contraints Failed")  
-
-def update_client_status(client_id,new_status):
-
-    client_detail = get_client_by_id(client_id)
-
-    if client_detail is None:
-        raise ValueError("Client not Exists")  
-
-    current_status = client_detail[4]     
+        raise ValueError("Check Constraints Failed")
     
-    valid_transaction = {
-        "lead":["contacted","converted"],
-        "contacted": ["converted","lost"],
-        "converted":[],
-        "lost":[],
+def update_client_status(client_id, new_status):
 
+    client_details = get_client_by_id(client_id)
+
+    if client_details is None:
+        raise ValueError("Client not Exists")
+    
+    current_status = client_details[4]
+    new_status = new_status.strip().lower()
+
+    valid_transitions = {
+        "lead" : ["contacted", "lost"],
+        "contacted" : ["converted", "lost"],
+        "converted" : [],
+        "lost" : []
     }
- 
-    if new_status not in valid_transaction(current_status):
-        raise ValueError("Invalid status interaction")
 
-    try :
+    if new_status not in valid_transitions[current_status]:
+        raise ValueError("Invalid status transitions")
+    
+    try:
         update_client(client_id, new_status)
-
     except sqlite3.IntegrityError:
-        raise ValueError("Cllient not Exists")  
-
+        raise ValueError ("Check Constraints Fail")
+    
     Updated_info = get_client_by_id(client_id)
 
     update_status = Updated_info[4]
 
-    return{
+    return {
         "client_id" : client_id,
-        "update_status" : update_status
-    } 
+        "Update_status" : update_status
+    }
 
 def view_records(status):
 
-    valid_interaction = {"call","email","meeting"}
+    valid_interaction = {"lead", "contacted", "converted", "lost"}
+
     status = status.strip().lower()
 
     if status not in valid_interaction:
-        raise ValueError("Invalid Status Type")
+        raise ValueError("Invalid Status type")
     
-    try :
-        records = view_record_by_status(status)
-
+    try:
+        records = view_records_by_status(status)
     except sqlite3.IntegrityError:
-        raise ValueError("Check Status Failed")
+        raise ValueError ("Check Status Failed")
 
-    return records     
-
-
-       
-
- 
-        
-
+    return records
