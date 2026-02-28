@@ -98,3 +98,44 @@ def view_records_by_status(status):
     conn.close()
 
     return row
+
+def get_client_status_counts():
+
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT status , COUNT(*) FROM clients GROUP BY status")
+
+    result = cursor.fetchall()
+    conn.close()
+
+    return result
+
+def get_total_clients_count():
+
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM clients")
+
+    row = cursor.fetchone()
+
+    result = row[0] if row[0] is not None else 0
+    conn.close()
+
+    return result
+
+def get_most_active_client():
+
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT client_id, COUNT(*) from interactions GROUP BY client_id 
+                   ORDER BY COUNT(*) DESC LIMIT 1
+""")
+    
+    result = cursor.fetchone()
+    conn.close()
+
+    return result
