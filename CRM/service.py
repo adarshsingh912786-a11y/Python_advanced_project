@@ -98,3 +98,4 @@ def view_records(status):
         raise ValueError ("Check Status Failed")
 
     return records
+

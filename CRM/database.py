@@ -131,8 +131,11 @@ def get_most_active_client():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT client_id, COUNT(*) from interactions GROUP BY client_id 
-                   ORDER BY COUNT(*) DESC LIMIT 1
+        SELECT c.id, c.name,  COUNT(i.id) as interaction_count
+                   FROM clients c JOIN interactions i 
+                   ON c.id = i.client_id
+                   GROUP BY c.id
+                   ORDER BY interaction_count DESC LIMIT 1
 """)
     
     result = cursor.fetchone()
