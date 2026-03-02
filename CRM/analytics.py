@@ -18,10 +18,9 @@ def get_status_summary():
     if summary is None:
         return status_summary
     
-    status_summary["lead"] = summary[0][1]
-    status_summary["contacted"] = summary[1][1]
-    status_summary["converted"] = summary[2][1]
-    status_summary["lost"] = summary[3][1]
+    
+    for status , count in summary:
+        status_summary[status] = count
 
     return status_summary
 
@@ -33,7 +32,7 @@ def get_coversion_rate():
     if total == 0:
         return 0.0
     
-    converted = summary[2][1]
+    converted = summary['converted']
 
     return (converted/total)*100
 
